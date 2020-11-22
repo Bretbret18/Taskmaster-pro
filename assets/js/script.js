@@ -1,5 +1,57 @@
 var tasks = {};
 
+$(".card .list-group").sortable({
+  connectWith: $(".card .list-group"),
+  scroll: false,
+  tolerance: "pointer",
+  helper: "clone",
+  activate: function(event) {
+    console.log("activate", this);
+  },
+  deactivate: function(event) {
+    console.log("deactivate", this);
+  },
+  over: function(event) {
+    console.log("over", event.target);
+  },
+  out: function(event) {
+    console.log("out", event.target);
+  },
+  update: function(event) {
+   // array to store the task data in //
+   
+    // loop over current set of children in sortable list //
+    $(this).children().each(function() {
+      var text = $(this)
+      .find("p")
+      .text()
+      .trim();
+
+      var date = $(this)
+      .find("span")
+      .text()
+      .trim();
+
+      // trim down list's ID to match object property //
+      var arrName =$(this)
+      .attr("id")
+      .replace("list-", "");
+
+      // update array on tasks object and save
+      tasks[arrName] = tempArr;
+      saveTasks();
+
+      // add task data to the temp array as an object //
+      tempArr.push({
+        text: text,
+        date: date
+      });
+    });
+
+    console.log(tempArr);
+  }
+});
+
 
 var createTask = function (taskText, taskDate, taskList) {
   // create elements that make up a task item
@@ -36,7 +88,7 @@ var loadTasks = function () {
   // loop over object properties
   $.each(tasks, function (list, arr) {
 
-    //console.log(list, arr);
+    console.log(list, arr);
 
     // then loop over sub-array
     arr.forEach(function (task) {
@@ -74,7 +126,7 @@ $(".list-group").on("blur", "textarea", function () {
   var status = $(this)
     .closest(".list-group")
     .attr("id")
-    .replace("list-", "");
+    .replace("list-", ""); // issue? //
 
   // get the task's position in the list of other li elements //
   var index = $(this)
@@ -105,7 +157,7 @@ $(".list-group").on("blur", "input[type='text']", function () {
   var status = $(this)
     .closest("list-group")
     .attr("id")
-    .replace("list-", "");
+    .replace("list-", ""); // issue? //
 
   // get the task's position in the list of other li elements //
   var index = $(this)
@@ -144,6 +196,22 @@ $(".list-group").on("click", "span", function () {
 
   // automatically focus on new element
   dateInput.trigger("focus");
+});
+
+// Trash element //
+$("#trash").droppable({
+  accept: ".card .list-group-item",
+  tolerance: "touch",
+  drop: function(event, ui) {
+   ui.draggable.remove();
+    console.log("drop");
+  },
+  over: function(event, ui) {
+    console.log("over");
+  },
+  out: function(event, ui) {
+    console.log("out");
+  }
 });
 
 
